@@ -1,2 +1,2 @@
 # .spacemacs.d
-Spacemacs config
+Spacemacs config. Clone in ${HOME}.
