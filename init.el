@@ -60,6 +60,7 @@ This function should only modify configuration layer settings."
             shell-default-position 'bottom)
 
      (python :variables
+             python-auto-set-local-pyvenv-virtualenv 'on-project-switch
              python-test-runner 'pytest
              python-backend 'lsp
              ;; python-lsp-server 'mspyls
