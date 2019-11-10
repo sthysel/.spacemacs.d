@@ -2,6 +2,9 @@
 
 Spacemacs config. Clone in ${HOME}.
 
+This is for the developer brance of spacemacs, using emacs-git (emacs 27),
+usually on Arch
+
 * Python layer setup
 * org mode tunings
 
