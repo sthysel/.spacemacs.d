@@ -53,7 +53,8 @@ This function should only modify configuration layer settings."
      markdown
      multiple-cursors
      (org :variables
-          org-enable-github-support t)
+          org-enable-github-support t
+          org-want-todo-bindings t)
      spell-checking
      syntax-checking
      treemacs
