@@ -70,10 +70,11 @@ This function should only modify configuration layer settings."
             shell-default-position 'bottom)
 
      (python :variables
+             python-pipenv-activate t
+             python-backend 'lsp
+             ;; python-lsp-server 'pyright
              python-auto-set-local-pyvenv-virtualenv 'on-visit
              python-test-runner 'pytest
-             python-backend 'lsp
-             python-lsp-server 'mspyls
              python-enable-yapf-format-on-save t
              python-formatter 'yapf
              python-fill-column 99
