@@ -82,7 +82,10 @@ This function should only modify configuration layer settings."
              python-formatter 'yapf
              python-fill-column 99
              python-sort-imports-on-save t)
-     ranger
+     (ranger :variables
+             ranger-override-dired 'ranger
+             ranger-enter-with-minus 'ranger
+             ranger-show-preview t)
    )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
