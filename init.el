@@ -35,6 +35,7 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layers
    '(
      rcirc
+     cmake
      rust
      html
      epub
@@ -73,16 +74,20 @@ This function should only modify configuration layer settings."
             shell-default-position 'bottom)
 
      (python :variables
-             python-auto-set-local-pyvenv-virtualenv 'on-visit
-             python-test-runner 'pytest
+             ;;python-pipenv-activate t
              python-backend 'lsp
-             python-lsp-server 'mspyls
+             python-lsp-server 'pyright
+             ;; python-auto-set-local-pyvenv-virtualenv 'on-visit
+             python-test-runner 'pytest
              python-enable-yapf-format-on-save t
              python-formatter 'yapf
              python-fill-column 99
              python-sort-imports-on-save t)
-     ranger
      (elfeed :variables rmh-elfeed-org-files (list "~/.config/elfeed/elfeed.org"))
+     (ranger :variables
+             ranger-override-dired 'ranger
+             ranger-enter-with-minus 'ranger
+             ranger-show-preview t)
    )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -506,6 +511,27 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
+
+  (setq-default git-magit-status-fullscreen t)
+
+  ;; org-roam
+  (setq org-roam-directory "~/org-roam")
+  (setq org-roam-graph-viewer "google-chrome-stable")
+
+  (setq org-roam-capture-templates
+        '(
+          ("d" "default" plain (function org-roam--capture-get-point)
+           "%?"
+            :file-name "${slug}"
+            :head "#+title: ${title}
+#+roam_tags:
+#+startup: inlineimages
+\n"
+            :unnarrowed t)
+          )
+        )
+
+  (setq org-download-screenshot-method "flameshot gui --raw > %s")
   )
 
 (defun dotspacemacs/user-load ()
@@ -521,6 +547,11 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+
+  (setq magit-repository-directories
+        '(("~/workspace/" . 3) )
+        )
+  (global-git-commit-mode t)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
