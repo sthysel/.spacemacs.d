@@ -93,6 +93,7 @@ This function should only modify configuration layer settings."
              ranger-override-dired 'ranger
              ranger-enter-with-minus 'ranger
              ranger-show-preview t)
+     terraform
    )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -250,7 +251,7 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
+   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 0.7)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
@@ -258,7 +259,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; Default font or prioritized list of fonts.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 16.0
+                               :size 13.0
                                :weight normal
                                :width normal)
 
@@ -584,7 +585,6 @@ before packages are loaded."
   (setq magit-repository-directories
         '(("~/workspace/" . 3) )
         )
-  (global-git-commit-mode t)
 
   (use-package x509-mode
     :ensure t)
