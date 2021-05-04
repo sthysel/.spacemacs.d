@@ -552,7 +552,7 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (setq-default git-magit-status-fullscreen t)
 
   ;; org-roam
-  (setq org-roam-directory "~/org-roam")
+  (setq org-roam-directory "~/org/roam/")
   (setq org-roam-graph-viewer "google-chrome-stable")
 
   ;; TODO
