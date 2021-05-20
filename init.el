@@ -93,7 +93,9 @@ This function should only modify configuration layer settings."
              ranger-override-dired 'ranger
              ranger-enter-with-minus 'ranger
              ranger-show-preview t)
-     terraform
+     (terraform :variables
+                terraform-auto-format-on-save t
+                terraform-backend 'lsp)
    )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -259,7 +261,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; Default font or prioritized list of fonts.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 13.0
+                               :size 11.0
                                :weight normal
                                :width normal)
 
