@@ -606,7 +606,7 @@ before packages are loaded."
            "%?"
            ;;:file-name "%(+org-notes-subdir)/${slug}"
            :file-name "${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS:\n#+DATE: %T\n#+startup: INLINEIMAGES\n\n"
+           :head "#+TITLE: ${title}\n#+ROAM_TAGS:\n#+DATE: %T\n#+STARTUP: inlineimages\n\n"
            :unnarrowed t)
           ("s" "sailing" plain (function org-roam--capture-get-point)
            "%?"
