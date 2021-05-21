@@ -65,7 +65,10 @@ This function should only modify configuration layer settings."
           org-enable-reveal-js-support t
           org-enable-bootstrap-support t
           org-enable-github-support t
-          org-want-todo-bindings t)
+          org-want-todo-bindings t
+          org-enable-notifications t
+          org-start-notification-daemon-on-startup t
+          )
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
@@ -81,6 +84,7 @@ This function should only modify configuration layer settings."
              python-sort-imports-on-save t)
      (elfeed :variables rmh-elfeed-org-files (list "~/.config/elfeed/elfeed.org"))
      (ranger :variables
+             ranger-ignored-extensions '("mkv" "iso" "mp4")
              ranger-override-dired 'ranger
              ranger-enter-with-minus 'ranger
              ranger-show-preview t)
@@ -253,7 +257,7 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
+   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.4)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
@@ -547,49 +551,6 @@ It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
 
 
-  ;; confluence
-  (setq confluence-url "https://bhp1.atlassian.net/confluence/rpc/xmlrpc")
-  (setq-default git-magit-status-fullscreen t)
-
-  ;; org-roam
-  (setq org-roam-directory "~/org/roam/")
-  (setq org-roam-graph-viewer "google-chrome-stable")
-
-  ;; TODO
-  (defun +org-notes-subdir ()
-  "Select notes subdirectory."
-  (interactive)
-  (let ((dirs (cons "."
-                    (seq-map
-                     (lambda (p)
-                       (string-remove-prefix +org-notes-directory p))
-                     (+file-subdirs +org-notes-directory nil t)))))
-    (completing-read "Subdir: " dirs nil t))
-  )
-
-  (setq org-roam-capture-templates
-        '(
-          ("d" "default" plain (function org-roam--capture-get-point)
-           "%?"
-           ;;:file-name "%(+org-notes-subdir)/${slug}"
-           :file-name "${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS:\n#+DATE: %T\n#+startup: inlineimages\n\n"
-           :unnarrowed t)
-          ("s" "sailing" plain (function org-roam--capture-get-point)
-           "%?"
-           ;;:file-name "%(+org-notes-subdir)/${slug}"
-           :file-name "sailing/${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS: sailing rya\n#+DATE: %T\n#+startup: inlineimages\n\n"
-           :unnarrowed t)
-         ("p" "Product Variability" plain (function org-roam--capture-get-point)
-          "%?"
-          :file-name "bhp/pv/${slug}"
-          :head "#+TITLE: ${title}\n#+ROAM_TAGS: bhp pv\n#+DATE: %T\n#+startup: inlineimages\n\n"
-          :unnarrowed t)
-         )
-         )
-
-  ;;(setq org-download-screenshot-method "flameshot gui --raw > %s")
   )
 
 
@@ -617,6 +578,60 @@ before packages are loaded."
   (setq magit-repository-directories
         '(("~/workspace/" . 3) )
         )
+
+
+  ;; confluence
+  (setq confluence-url "https://bhp1.atlassian.net/confluence/rpc/xmlrpc")
+  (setq-default git-magit-status-fullscreen t)
+
+  ;; org-roam
+  (setq org-roam-directory "~/org/roam/")
+  (setq org-roam-graph-viewer "google-chrome-stable")
+
+  ;; TODO
+  (defun +org-notes-subdir ()
+    "Select notes subdirectory."
+    (interactive)
+    (let ((dirs (cons "."
+                      (seq-map
+                       (lambda (p)
+                         (string-remove-prefix +org-notes-directory p))
+                       (+file-subdirs +org-notes-directory nil t)))))
+      (completing-read "Subdir: " dirs nil t))
+    )
+
+  (setq org-roam-capture-templates
+        '(
+          ("d" "default" plain (function org-roam--capture-get-point)
+           "%?"
+           ;;:file-name "%(+org-notes-subdir)/${slug}"
+           :file-name "${slug}"
+           :head "#+TITLE: ${title}\n#+ROAM_TAGS:\n#+DATE: %T\n#+startup: INLINEIMAGES\n\n"
+           :unnarrowed t)
+          ("s" "sailing" plain (function org-roam--capture-get-point)
+           "%?"
+           ;;:file-name "%(+org-notes-subdir)/${slug}"
+           :file-name "sailing/${slug}"
+           :head "#+TITLE: ${title}\n#+ROAM_TAGS: sailing rya\n#+DATE: %T\n#+startup: INLINEIMAGES\n\n"
+           :unnarrowed t)
+         ("p" "Product Variability" plain (function org-roam--capture-get-point)
+          "%?"
+          :file-name "bhp/pv/${slug}"
+          :head "#+TITLE: ${title}\n#+ROAM_TAGS: bhp pv\n#+DATE: %T\n#+startup: INLINEIMAGES\n\n"
+          :unnarrowed t)
+         )
+        )
+
+  (setq org-capture-templates
+        (quote
+         (("p" "Private templates")
+          ("pt" "TODO entry" entry
+           (file+headline "~/org/private.org" "Capture")
+           (file "~/org/templates/todo.txt"))))
+  )
+
+  ;;(setq org-download-screenshot-method "flameshot gui --raw > %s")
+
 
   ;; (use-package x509-mode
   ;;   :ensure t)
