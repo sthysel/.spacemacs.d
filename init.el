@@ -31,11 +31,17 @@ This function should only modify configuration layer settings."
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
 
+   org-roam-v2-ack t
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(javascript
+     rust
+     auto-completion
      csv
+     dart
      emacs-lisp
+     emoji
+     unicode-fonts
      git
      graphviz
      helm
@@ -51,36 +57,38 @@ This function should only modify configuration layer settings."
      terraform
      treemacs
      version-control
-     yaml
+     (yaml :variables
+           ;;yaml-enable-lsp t
+           )
      (org :variables
           jiralib-url "https://bhp1.atlassian.net"
-          org-log-into-drawer t
-          org-enable-jira-support t
-          org-enable-valign t
-          org-enable-jira-support t
-          org-enable-roam-support t
-          org-enable-verb-support t
-          org-enable-epub-support t
-          org-projectile-file "TODO.org"
-          org-enable-reveal-js-support t
           org-enable-bootstrap-support t
+          org-enable-epub-support t
           org-enable-github-support t
-          org-want-todo-bindings t
+          org-enable-jira-support t
+          org-enable-jira-support t
           org-enable-notifications t
+          org-enable-reveal-js-support t
+          org-enable-roam-protocol t
+          org-enable-roam-server t
+          org-enable-roam-support t
+          org-enable-valign t
+          org-enable-verb-support t
+          org-log-into-drawer t
+          org-projectile-file "TODO.org"
           org-start-notification-daemon-on-startup t
+          org-want-todo-bindings t
           )
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
      (python :variables
-             ;;python-pipenv-activate t
+             python-poetry-activate t
              python-backend 'lsp
              python-lsp-server 'pyright
-             ;; python-auto-set-local-pyvenv-virtualenv 'on-visit
              python-test-runner 'pytest
-             python-enable-yapf-format-on-save t
-             python-formatter 'yapf
-             python-fill-column 99
+             python-formatter 'black
+             python-format-on-save t
              python-sort-imports-on-save t)
      (elfeed :variables rmh-elfeed-org-files (list "~/.config/elfeed/elfeed.org"))
      (ranger :variables
@@ -266,8 +274,8 @@ It should only modify the values of Spacemacs settings."
    ;; Default font or prioritized list of fonts. The `:size' can be specified as
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 16.0
+   dotspacemacs-default-font '("Fira Code"
+                               :size 9.0
                                :weight normal
                                :width normal)
 
@@ -540,17 +548,14 @@ variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'.
 See the header of this file for more information."
   (spacemacs/load-spacemacs-env))
 
-
-
-
 (defun dotspacemacs/user-init ()
   "Initialization for user code:
 This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-
-
+  (setq-default dotspacemacs-configuration-layers '(
+    (python :variables python-fill-column 99)))
   )
 
 
@@ -585,7 +590,7 @@ before packages are loaded."
   (setq-default git-magit-status-fullscreen t)
 
   ;; org-roam
-  (setq org-roam-directory "~/org/roam/")
+  (setq org-roam-directory (file-truename "~/org/roam/"))
   (setq org-roam-graph-viewer "google-chrome-stable")
 
   ;; TODO
@@ -600,37 +605,61 @@ before packages are loaded."
       (completing-read "Subdir: " dirs nil t))
     )
 
+  ;; (setq org-roam-capture-templates
+  ;;       '(
+  ;;         ("d" "default" plain (function org-roam--capture-get-point)
+  ;;          "%?"
+  ;;          ;;:file-name "%(+org-notes-subdir)/${slug}"
+  ;;          :file-name "${slug}"
+  ;;          :head "#+title: ${title}\n#+roam_tags:\n#+date: %t\n#+startup: inlineimages\n\n"
+  ;;          :unnarrowed t)
+  ;;         ("s" "sailing" plain (function org-roam--capture-get-point)
+  ;;          "%?"
+  ;;          ;;:file-name "%(+org-notes-subdir)/${slug}"
+  ;;          :file-name "sailing/${slug}"
+  ;;          :head "#+title: ${title}\n#+roam_tags: sailing rya\n#+date: %t\n#+startup: inlineimages\n\n"
+  ;;          :unnarrowed t)
+  ;;        ("p" "product variability" plain (function org-roam--capture-get-point)
+  ;;         "%?"
+  ;;         :file-name "bhp/pv/${slug}"
+  ;;         :head "#+title: ${title}\n#+roam_tags: bhp pv\n#+date: %t\n#+startup: inlineimages\n\n"
+  ;;         :unnarrowed t)
+  ;;        )
+  ;;       )
+
+  ;; (setq org-roam-capture-templates
+  ;;       '(("d"
+  ;;          "default"
+  ;;          plain
+  ;;          (file "~/org/templates/roam-default.template") ;; template
+  ;;          :if-new (file "${slug}.org")
+  ;;          :unnarrowed t))
+  ;; )
+
+
   (setq org-roam-capture-templates
-        '(
-          ("d" "default" plain (function org-roam--capture-get-point)
-           "%?"
-           ;;:file-name "%(+org-notes-subdir)/${slug}"
-           :file-name "${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS:\n#+DATE: %T\n#+STARTUP: inlineimages\n\n"
+        '(("d" ;; key
+           "default" ;; description
+           plain ;; type
+           (file "~/org/templates/roam-default.template") ;; template
+           :if-new (file "${slug}.org") ;; target
+           :immediate-finish t
            :unnarrowed t)
-          ("s" "sailing" plain (function org-roam--capture-get-point)
-           "%?"
-           ;;:file-name "%(+org-notes-subdir)/${slug}"
-           :file-name "sailing/${slug}"
-           :head "#+TITLE: ${title}\n#+ROAM_TAGS: sailing rya\n#+DATE: %T\n#+startup: INLINEIMAGES\n\n"
-           :unnarrowed t)
-         ("p" "Product Variability" plain (function org-roam--capture-get-point)
-          "%?"
-          :file-name "bhp/pv/${slug}"
-          :head "#+TITLE: ${title}\n#+ROAM_TAGS: bhp pv\n#+DATE: %T\n#+startup: INLINEIMAGES\n\n"
-          :unnarrowed t)
+          )
          )
-        )
 
   (setq org-capture-templates
-        (quote
-         (("p" "Private templates")
-          ("pt" "TODO entry" entry
+        '(("p" "Private templates") ;; main menu
+          ("pt" ;; keys
+           "TODO entry"
+           entry
            (file+headline "~/org/private.org" "Capture")
-           (file "~/org/templates/todo.txt"))))
+           (file "~/org/templates/todo.txt")
+           )
+          )
   )
 
-  ;;(setq org-download-screenshot-method "flameshot gui --raw > %s")
+  (setq org-download-screenshot-method "flameshot gui --delay 3000 --raw > %s")
 
 
   ;; (use-package x509-mode
@@ -654,7 +683,7 @@ This function is called at the very end of Spacemacs initialization."
  '(evil-want-Y-yank-to-eol nil)
  '(org-agenda-files '("~/org/todo.org"))
  '(package-selected-packages
-   '(selectric-mode ox-jira org-jira confluence xml-rpc sqlup-mode sql-indent graphviz-dot-mode x509-mode rcirc-notify rcirc-color org-roam emacsql-sqlite3 emacsql verb ox-epub org-re-reveal ox-twbs toml-mode ron-mode racer helm-gtags ggtags flycheck-rust counsel-gtags cargo rust-mode company-quickhelp web-mode web-beautify tagedit slim-mode scss-mode sass-mode pug-mode prettier-js impatient-mode simple-httpd helm-css-scss haml-mode emmet-mode counsel-css counsel swiper ivy company-web web-completion-data add-node-modules-path nov esxml zenburn-theme zen-and-art-theme white-sand-theme underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme tao-theme tangotango-theme tango-plus-theme tango-2-theme sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme seti-theme reverse-theme rebecca-theme railscasts-theme purple-haze-theme professional-theme planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme organic-green-theme omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme mustang-theme monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme lush-theme light-soap-theme kaolin-themes jbeans-theme jazz-theme ir-black-theme inkpot-theme heroku-theme hemisu-theme hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme gandalf-theme flatui-theme flatland-theme farmhouse-theme eziam-theme exotica-theme espresso-theme dracula-theme doom-themes django-theme darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme chocolate-theme autothemer cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes afternoon-theme systemd ox-gfm ranger lsp-ui lsp-treemacs lsp-python-ms python helm-lsp dap-mode bui tree-mode company-lsp lsp-mode dash-functional unfill mwim helm-company fuzzy dockerfile-mode docker json-mode tablist docker-tramp json-snatcher json-reformat company-statistics company-reftex company-anaconda yasnippet auctex ac-ispell auto-complete yaml-mode company yapfify pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements live-py-mode importmagic epc ctable concurrent deferred helm-pydoc cython-mode blacken anaconda-mode pythonic xterm-color smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain multi-term mmm-mode markdown-toc markdown-mode magit-svn magit-gitflow magit-popup htmlize helm-org-rifle helm-gitignore helm-git-grep gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip evil-org evil-magit magit transient git-commit with-editor eshell-z eshell-prompt-extras esh-help diff-hl browse-at-remote auto-dictionary treemacs-evil paradox spinner evil-visualstar evil-visual-mark-mode evil-tutor evil-textobj-line evil-surround evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-goggles evil-exchange evil-ediff evil-cleverparens paredit evil-args evil-anzu anzu evil goto-chg undo-tree ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile toc-org symon symbol-overlay string-inflection spaceline-all-the-icons smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el password-generator overseer org-plus-contrib org-bullets open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-unimpaired evil-numbers evil-nerd-commenter evil-escape eval-sexp-fu elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish devdocs define-word counsel-projectile column-enforce-mode clean-aindent-mode centered-cursor-mode bind-map auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line))
+   '(tern npm-mode nodejs-repl livid-mode skewer-mode js2-refactor multiple-cursors js2-mode js-doc import-js grizzl unicode-fonts ucs-utils font-utils persistent-soft pcache emojify emoji-cheat-sheet-plus company-emoji lsp-dart flutter dart-mode selectric-mode ox-jira org-jira confluence xml-rpc sqlup-mode sql-indent graphviz-dot-mode x509-mode rcirc-notify rcirc-color org-roam emacsql-sqlite3 emacsql verb ox-epub org-re-reveal ox-twbs toml-mode ron-mode racer helm-gtags ggtags flycheck-rust counsel-gtags cargo rust-mode company-quickhelp web-mode web-beautify tagedit slim-mode scss-mode sass-mode pug-mode prettier-js impatient-mode simple-httpd helm-css-scss haml-mode emmet-mode counsel-css counsel swiper ivy company-web web-completion-data add-node-modules-path nov esxml zenburn-theme zen-and-art-theme white-sand-theme underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme tao-theme tangotango-theme tango-plus-theme tango-2-theme sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme seti-theme reverse-theme rebecca-theme railscasts-theme purple-haze-theme professional-theme planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme organic-green-theme omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme mustang-theme monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme lush-theme light-soap-theme kaolin-themes jbeans-theme jazz-theme ir-black-theme inkpot-theme heroku-theme hemisu-theme hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme gandalf-theme flatui-theme flatland-theme farmhouse-theme eziam-theme exotica-theme espresso-theme dracula-theme doom-themes django-theme darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme chocolate-theme autothemer cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes afternoon-theme systemd ox-gfm ranger lsp-ui lsp-treemacs lsp-python-ms python helm-lsp dap-mode bui tree-mode company-lsp lsp-mode dash-functional unfill mwim helm-company fuzzy dockerfile-mode docker json-mode tablist docker-tramp json-snatcher json-reformat company-statistics company-reftex company-anaconda yasnippet auctex ac-ispell auto-complete yaml-mode company yapfify pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements live-py-mode importmagic epc ctable concurrent deferred helm-pydoc cython-mode blacken anaconda-mode pythonic xterm-color smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain multi-term mmm-mode markdown-toc markdown-mode magit-svn magit-gitflow magit-popup htmlize helm-org-rifle helm-gitignore helm-git-grep gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip evil-org evil-magit magit transient git-commit with-editor eshell-z eshell-prompt-extras esh-help diff-hl browse-at-remote auto-dictionary treemacs-evil paradox spinner evil-visualstar evil-visual-mark-mode evil-tutor evil-textobj-line evil-surround evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-goggles evil-exchange evil-ediff evil-cleverparens paredit evil-args evil-anzu anzu evil goto-chg undo-tree ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile toc-org symon symbol-overlay string-inflection spaceline-all-the-icons smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el password-generator overseer org-plus-contrib org-bullets open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-unimpaired evil-numbers evil-nerd-commenter evil-escape eval-sexp-fu elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish devdocs define-word counsel-projectile column-enforce-mode clean-aindent-mode centered-cursor-mode bind-map auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line))
  '(safe-local-variable-values '((encoding . utf-8))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
