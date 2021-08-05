@@ -53,6 +53,7 @@ This function should only modify configuration layer settings."
      version-control
      yaml
      (org :variables
+          org-roam-v2-ack t
           jiralib-url "https://bhp1.atlassian.net"
           org-log-into-drawer t
           org-enable-jira-support t
@@ -68,6 +69,7 @@ This function should only modify configuration layer settings."
           org-want-todo-bindings t
           org-enable-notifications t
           org-start-notification-daemon-on-startup t
+          org-download-image-dir "./images/"
           )
      (shell :variables
             shell-default-height 30
@@ -585,7 +587,8 @@ before packages are loaded."
   (setq-default git-magit-status-fullscreen t)
 
   ;; org-roam
-  (setq org-roam-directory "~/org/roam/")
+  (setq org-roam-v2-ack t)
+  (setq org-roam-directory (file-truename "~/org/roam/"))
   (setq org-roam-graph-viewer "google-chrome-stable")
 
   ;; TODO
