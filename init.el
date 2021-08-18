@@ -63,6 +63,7 @@ This function should only modify configuration layer settings."
            ;;yaml-enable-lsp t
            )
      (org :variables
+          org-roam-v2-ack t
           jiralib-url "https://bhp1.atlassian.net"
           org-enable-bootstrap-support t
           org-enable-epub-support t
@@ -79,6 +80,7 @@ This function should only modify configuration layer settings."
           org-log-into-drawer t
           org-projectile-file "TODO.org"
           org-start-notification-daemon-on-startup t
+          org-download-image-dir "./images/"
           org-want-todo-bindings t
           )
      (shell :variables
@@ -592,6 +594,7 @@ before packages are loaded."
   (setq-default git-magit-status-fullscreen t)
 
   ;; org-roam
+  (setq org-roam-v2-ack t)
   (setq org-roam-directory (file-truename "~/org/roam/"))
   (setq org-roam-graph-viewer "google-chrome-stable")
 
