@@ -41,6 +41,7 @@ This function should only modify configuration layer settings."
      auto-completion
      csv
      dart
+     imenu-list
      emacs-lisp
      emoji
      unicode-fonts
@@ -59,6 +60,7 @@ This function should only modify configuration layer settings."
      terraform
      (treemacs :variables
                treemacs-use-all-the-icons-theme t
+               treemacs-use-git-mode 'deferred
                )
      version-control
      (yaml :variables
@@ -87,10 +89,11 @@ This function should only modify configuration layer settings."
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
+     (ipython-notebook :variables ein-backend 'jupyter)
      (python :variables
              python-poetry-activate t
              python-backend 'lsp
-             python-lsp-server 'pyright
+             python-lsp-server 'pylsp
              python-test-runner 'pytest
              python-formatter 'black
              python-format-on-save t
@@ -515,8 +518,8 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-whitespace-cleanup nil
 
-   ;; If non nil activate `clean-aindent-mode' which tries to correct
-   ;; virtual indentation of simple modes. This can interfer with mode specific
+   ;; If non-nil activate `clean-aindent-mode' which tries to correct
+   ;; virtual indentation of simple modes. This can interfere with mode specific
    ;; indent handling like has been reported for `go-mode'.
    ;; If it does deactivate it here.
    ;; (default t)
@@ -539,7 +542,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-pretty-docs nil
 
    ;; If nil the home buffer shows the full path of agenda items
-   ;; and todos. If non nil only the file name is shown.
+   ;; and todos. If non-nil only the file name is shown.
    dotspacemacs-home-shorten-agenda-source nil
 
    ;; If non-nil then byte-compile some of Spacemacs files.
@@ -551,7 +554,8 @@ This function defines the environment variables for your Emacs session. By
 default it calls `spacemacs/load-spacemacs-env' which loads the environment
 variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'.
 See the header of this file for more information."
-  (spacemacs/load-spacemacs-env))
+  (spacemacs/load-spacemacs-env)
+)
 
 (defun dotspacemacs/user-init ()
   "Initialization for user code:
@@ -588,11 +592,6 @@ before packages are loaded."
   (setq magit-repository-directories
         '(("~/workspace/" . 3) )
         )
-
-
-  ;; confluence
-  (setq confluence-url "https://bhp1.atlassian.net/confluence/rpc/xmlrpc")
-  (setq-default git-magit-status-fullscreen t)
 
   ;; org-roam
   (setq org-roam-v2-ack t)
