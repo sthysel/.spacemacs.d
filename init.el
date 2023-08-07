@@ -28,20 +28,20 @@ This function should only modify configuration layer settings."
 
    ;; If non-nil layers with lazy install support are lazy installed.
    ;; List of additional paths where to look for configuration layers.
-   ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
+   ;; Paths must have a trailing slash (i.e. "~/.mycontribs/")
    dotspacemacs-configuration-layer-path '()
 
    org-roam-v2-ack t
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(systemd
-     docker
-     javascript
-     rust
-     auto-completion
-     csv
-     dart
-     imenu-list
+   '(rust
+     ;; ----------------------------------------------------------------
+     ;; Example of useful layers you may want to use right away.
+     ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
+     ;; `M-m f e R' (Emacs style) to install them.
+     ;; ----------------------------------------------------------------
+     ;; auto-completion
+     ;; better-defaults
      emacs-lisp
      emoji
      unicode-fonts
@@ -50,7 +50,9 @@ This function should only modify configuration layer settings."
      helm
      helpful
      html
-     lsp
+     (lsp :variables
+          lsp-lens-enable t
+          )
      markdown
      multiple-cursors
      selectric
@@ -58,6 +60,8 @@ This function should only modify configuration layer settings."
      sql
      syntax-checking
      terraform
+     latex
+     themes-megapack
      (treemacs :variables
                treemacs-use-all-the-icons-theme t
                treemacs-use-git-mode 'deferred
@@ -87,13 +91,15 @@ This function should only modify configuration layer settings."
           org-want-todo-bindings t
           )
      (shell :variables
+            shell-default-shell 'vterm
+            shell-default-term-shell "/bin/bash"
             shell-default-height 30
             shell-default-position 'bottom)
      (ipython-notebook :variables ein-backend 'jupyter)
      (python :variables
              python-poetry-activate t
              python-backend 'lsp
-             python-lsp-server 'pylsp
+             python-lsp-server 'pyright
              python-test-runner 'pytest
              python-formatter 'black
              python-format-on-save t
@@ -104,6 +110,7 @@ This function should only modify configuration layer settings."
              ranger-override-dired 'ranger
              ranger-enter-with-minus 'ranger
              ranger-show-preview t)
+     (docker :variables docker-dockerfile-backend 'lsp)
    )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -137,9 +144,13 @@ It should only modify the values of Spacemacs settings."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
-   ;; If non-nil then enable support for the portable dumper. You'll need
-   ;; to compile Emacs 27 from source following the instructions in file
+   ;; If non-nil then enable support for the portable dumper. You'll need to
+   ;; compile Emacs 27 from source following the instructions in file
    ;; EXPERIMENTAL.org at to root of the git repository.
+   ;;
+   ;; WARNING: pdumper does not work with Native Compilation, so it's disabled
+   ;; regardless of the following setting when native compilation is in effect.
+   ;;
    ;; (default nil)
    dotspacemacs-enable-emacs-pdumper nil
 
@@ -224,6 +235,13 @@ It should only modify the values of Spacemacs settings."
    ;; If the value is nil then no banner is displayed. (default 'official)
    dotspacemacs-startup-banner 'official
 
+   ;; Scale factor controls the scaling (size) of the startup banner. Default
+   ;; value is `auto' for scaling the logo automatically to fit all buffer
+   ;; contents, to a maximum of the full image height and a minimum of 3 line
+   ;; heights. If set to a number (int or float) it is used as a constant
+   ;; scaling factor for the default logo size.
+   dotspacemacs-startup-banner-scale 'auto
+
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
@@ -239,6 +257,17 @@ It should only modify the values of Spacemacs settings."
 
    ;; True if the home buffer should respond to resize events. (default t)
    dotspacemacs-startup-buffer-responsive t
+
+   ;; Show numbers before the startup list lines. (default t)
+   dotspacemacs-show-startup-list-numbers t
+
+   ;; The minimum delay in seconds between number key presses. (default 0.4)
+   dotspacemacs-startup-buffer-multi-digit-delay 0.4
+
+   ;; If non-nil, show file icons for entries and headings on Spacemacs home buffer.
+   ;; This has no effect in terminal or if "all-the-icons" package or the font
+   ;; is not installed. (default nil)
+   dotspacemacs-startup-buffer-show-icons t
 
    ;; Default major mode for a new empty buffer. Possible values are mode
    ;; names such as `text-mode'; and `nil' to use Fundamental mode.
@@ -283,7 +312,7 @@ It should only modify the values of Spacemacs settings."
    ;; a non-negative integer (pixel size), or a floating-point (point size).
    ;; Point size is recommended, because it's device independent. (default 10.0)
    dotspacemacs-default-font '("FiraCode Nerd Font"
-                               :size 14.0
+                               :size 9.0
                                :weight normal
                                :width normal)
 
@@ -385,12 +414,12 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
-   ;; (default nil) (Emacs 24.4+ only)
-   dotspacemacs-maximized-at-startup nil
+   ;; (default t) (Emacs 24.4+ only)
+   dotspacemacs-maximized-at-startup t
 
    ;; If non-nil the frame is undecorated when Emacs starts up. Combine this
-   ;; variable with `dotspacemacs-maximized-at-startup' in OSX to obtain
-   ;; borderless fullscreen. (default nil)
+   ;; variable with `dotspacemacs-maximized-at-startup' to obtain fullscreen
+   ;; without external boxes. Also disables the internal border. (default nil)
    dotspacemacs-undecorated-at-startup nil
 
    ;; A value from the range (0..100), in increasing opacity, which describes
@@ -402,6 +431,11 @@ It should only modify the values of Spacemacs settings."
    ;; the transparency level of a frame when it's inactive or deselected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
    dotspacemacs-inactive-transparency 90
+
+   ;; A value from the range (0..100), in increasing opacity, which describes the
+   ;; transparency level of a frame background when it's active or selected. Transparency
+   ;; can be toggled through `toggle-background-transparency'. (default 90)
+   dotspacemacs-background-transparency 90
 
    ;; If non-nil show the titles of transient states. (default t)
    dotspacemacs-show-transient-state-title t
@@ -418,6 +452,10 @@ It should only modify the values of Spacemacs settings."
    ;; scrolling overrides the default behavior of Emacs which recenters point
    ;; when it reaches the top or bottom of the screen. (default t)
    dotspacemacs-smooth-scrolling t
+
+   ;; Show the scroll bar while scrolling. The auto hide time can be configured
+   ;; by setting this variable to a number. (default t)
+   dotspacemacs-scroll-bar-while-scrolling t
 
    ;; Control line numbers activation.
    ;; If set to `t', `relative' or `visual' then line numbers are enabled in all
@@ -508,7 +546,9 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil - same as frame-title-format)
    dotspacemacs-icon-title-format nil
 
-   ;; Show trailing whitespace (default t)
+   ;; Color highlight trailing whitespace in all prog-mode and text-mode derived
+   ;; modes such as c++-mode, python-mode, emacs-lisp, html-mode, rst-mode etc.
+   ;; (default t)
    dotspacemacs-show-trailing-whitespace t
 
    ;; Delete whitespace while saving buffer. Possible values are `all'
@@ -524,6 +564,9 @@ It should only modify the values of Spacemacs settings."
    ;; If it does deactivate it here.
    ;; (default t)
    dotspacemacs-use-clean-aindent-mode t
+
+   ;; Accept SPC as y for prompts if non-nil. (default nil)
+   dotspacemacs-use-SPC-as-y nil
 
    ;; If non-nil shift your number row to match the entered keyboard layout
    ;; (only in insert state). Currently supported keyboard layouts are:
@@ -685,16 +728,17 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(browse-url-browser-function 'browse-url-chrome)
  '(evil-want-Y-yank-to-eol nil)
  '(org-agenda-files '("~/org/todo.org"))
  '(org-export-backends '(ascii beamer html icalendar latex md odt confluence deck))
  '(package-selected-packages
-   '(treemacs-all-the-icons tern npm-mode nodejs-repl livid-mode skewer-mode js2-refactor multiple-cursors js2-mode js-doc import-js grizzl unicode-fonts ucs-utils font-utils persistent-soft pcache emojify emoji-cheat-sheet-plus company-emoji lsp-dart flutter dart-mode selectric-mode ox-jira org-jira confluence xml-rpc sqlup-mode sql-indent graphviz-dot-mode x509-mode rcirc-notify rcirc-color org-roam emacsql-sqlite3 emacsql verb ox-epub org-re-reveal ox-twbs toml-mode ron-mode racer helm-gtags ggtags flycheck-rust counsel-gtags cargo rust-mode company-quickhelp web-mode web-beautify tagedit slim-mode scss-mode sass-mode pug-mode prettier-js impatient-mode simple-httpd helm-css-scss haml-mode emmet-mode counsel-css counsel swiper ivy company-web web-completion-data add-node-modules-path nov esxml zenburn-theme zen-and-art-theme white-sand-theme underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme tao-theme tangotango-theme tango-plus-theme tango-2-theme sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme seti-theme reverse-theme rebecca-theme railscasts-theme purple-haze-theme professional-theme planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme organic-green-theme omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme mustang-theme monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme lush-theme light-soap-theme kaolin-themes jbeans-theme jazz-theme ir-black-theme inkpot-theme heroku-theme hemisu-theme hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme gandalf-theme flatui-theme flatland-theme farmhouse-theme eziam-theme exotica-theme espresso-theme dracula-theme doom-themes django-theme darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme chocolate-theme autothemer cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes afternoon-theme systemd ox-gfm ranger lsp-ui lsp-treemacs lsp-python-ms python helm-lsp dap-mode bui tree-mode company-lsp lsp-mode dash-functional unfill mwim helm-company fuzzy dockerfile-mode docker json-mode tablist docker-tramp json-snatcher json-reformat company-statistics company-reftex company-anaconda yasnippet auctex ac-ispell auto-complete yaml-mode company yapfify pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements live-py-mode importmagic epc ctable concurrent deferred helm-pydoc cython-mode blacken anaconda-mode pythonic xterm-color smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain multi-term mmm-mode markdown-toc markdown-mode magit-svn magit-gitflow magit-popup htmlize helm-org-rifle helm-gitignore helm-git-grep gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip evil-org evil-magit magit transient git-commit with-editor eshell-z eshell-prompt-extras esh-help diff-hl browse-at-remote auto-dictionary treemacs-evil paradox spinner evil-visualstar evil-visual-mark-mode evil-tutor evil-textobj-line evil-surround evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-goggles evil-exchange evil-ediff evil-cleverparens paredit evil-args evil-anzu anzu evil goto-chg undo-tree ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile toc-org symon symbol-overlay string-inflection spaceline-all-the-icons smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el password-generator overseer org-plus-contrib org-bullets open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-unimpaired evil-numbers evil-nerd-commenter evil-escape eval-sexp-fu elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish devdocs define-word counsel-projectile column-enforce-mode clean-aindent-mode centered-cursor-mode bind-map auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line))
+   '(rustic ansible ansible-doc company-ansible jinja2-mode zonokai-emacs modus-themes treemacs-all-the-icons tern npm-mode nodejs-repl livid-mode skewer-mode js2-refactor multiple-cursors js2-mode js-doc import-js grizzl unicode-fonts ucs-utils font-utils persistent-soft pcache emojify emoji-cheat-sheet-plus company-emoji lsp-dart flutter dart-mode selectric-mode ox-jira org-jira confluence xml-rpc sqlup-mode sql-indent graphviz-dot-mode x509-mode rcirc-notify rcirc-color org-roam emacsql-sqlite3 emacsql verb ox-epub org-re-reveal ox-twbs toml-mode ron-mode racer helm-gtags ggtags flycheck-rust counsel-gtags cargo rust-mode company-quickhelp web-mode web-beautify tagedit slim-mode scss-mode sass-mode pug-mode prettier-js impatient-mode simple-httpd helm-css-scss haml-mode emmet-mode counsel-css counsel swiper ivy company-web web-completion-data add-node-modules-path nov esxml zenburn-theme zen-and-art-theme white-sand-theme underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme tao-theme tangotango-theme tango-plus-theme tango-2-theme sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme seti-theme reverse-theme rebecca-theme railscasts-theme purple-haze-theme professional-theme planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme organic-green-theme omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme mustang-theme monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme lush-theme light-soap-theme kaolin-themes jbeans-theme jazz-theme ir-black-theme inkpot-theme heroku-theme hemisu-theme hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme gandalf-theme flatui-theme flatland-theme farmhouse-theme eziam-theme exotica-theme espresso-theme dracula-theme doom-themes django-theme darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme chocolate-theme autothemer cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes afternoon-theme systemd ox-gfm ranger lsp-ui lsp-treemacs lsp-python-ms python helm-lsp dap-mode bui tree-mode company-lsp lsp-mode dash-functional unfill mwim helm-company fuzzy dockerfile-mode docker json-mode tablist docker-tramp json-snatcher json-reformat company-statistics company-reftex company-anaconda yasnippet auctex ac-ispell auto-complete yaml-mode company yapfify pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements live-py-mode importmagic epc ctable concurrent deferred helm-pydoc cython-mode blacken anaconda-mode pythonic xterm-color smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain multi-term mmm-mode markdown-toc markdown-mode magit-svn magit-gitflow magit-popup htmlize helm-org-rifle helm-gitignore helm-git-grep gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip evil-org evil-magit magit transient git-commit with-editor eshell-z eshell-prompt-extras esh-help diff-hl browse-at-remote auto-dictionary treemacs-evil paradox spinner evil-visualstar evil-visual-mark-mode evil-tutor evil-textobj-line evil-surround evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-goggles evil-exchange evil-ediff evil-cleverparens paredit evil-args evil-anzu anzu evil goto-chg undo-tree ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile toc-org symon symbol-overlay string-inflection spaceline-all-the-icons smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el password-generator overseer org-plus-contrib org-bullets open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-unimpaired evil-numbers evil-nerd-commenter evil-escape eval-sexp-fu elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish devdocs define-word counsel-projectile column-enforce-mode clean-aindent-mode centered-cursor-mode bind-map auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line))
  '(safe-local-variable-values '((encoding . utf-8))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(highlight-parentheses-highlight ((nil (:weight ultra-bold))) t))
 )
